@@ -1,16 +1,13 @@
 // Import Express.js
-const express = require('express');
+import express from 'express';
 
 // Import built-in Node.js package 'path' to resolve path of files that are located on the server
-const path = require('path');
+import path from 'path';
 
-// Initialize an instance of Express.js
-const app = express();
-// Import Express.js
-const express = require('express');
+import uniqueId from 'uniqueid';
 
-// Import built-in Node.js package 'path' to resolve path of files that are located on the server
-const path = require('path');
+
+import fs from 'fs';
 
 // Initialize an instance of Express.js
 const app = express();
@@ -21,43 +18,33 @@ const PORT = 3001;
 // Static middleware pointing to the public folder
 app.use(express.static('public'));
 
-// Create Express.js routes for default '/', '/send' and '/routes' endpoints
-app.get('/', (req, res) => res.send('Navigate to /send or /routes'));
-app.get('/Yankees', (req, res) => res.send('The Champs of 2023 /routes'));
+//this is  post endpoint adds a new note
 
-app.get('/send', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public/sendFile.html'))
-);
+app.post('/api/notes', (req, res) => {
+  const newNote =  {notesid: uniqueId(), note: req.body}
 
-app.get('/routes', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public/routes.html'))
-);
+  fs.writeFile( `${path.dirname("server.js")}/db/db.json`,`${newNote}`, function (err) {
+    if (err) throw err;
+   
+  });
+  res.send('successful send')
+});
 
-// listen() method is responsible for listening for incoming connections on the specified port 
-app.listen(PORT, () =>
-  console.log(`Example app listening at http://localhost:${PORT}`)
-);
+//this gets all of the notes
 
-// Specify on which port the Express.js server will run
-const PORT = 3001;
+app.get('/api/notes', (req, res) => {
+  fs.readFile(`${path.dirname("server.js")}/db/db.json`, function (err, data) {
+    if (err) throw err;
+    res.send(data)
+  })
+});
 
-// Static middleware pointing to the public folder
-app.use(express.static('public'));
 
-// Create Express.js routes for default '/', '/send' and '/routes' endpoints
-app.get('/', (req, res) => res.send('Navigate to /send or /routes'));
-app.get('/Yankees', (req, res) => res.send('The Champs of 2023 /routes'));
-
-app.get('/send', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public/sendFile.html'))
-);
-
-app.get('/routes', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public/routes.html'))
-);
 
 // listen() method is responsible for listening for incoming connections on the specified port 
 app.listen(PORT, () =>
   console.log(`Example app listening at http://localhost:${PORT}`)
 );
+
+
 
